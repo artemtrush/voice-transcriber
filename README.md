@@ -17,3 +17,4 @@ Create a service account with the following roles:
 Configure these secrets in your repository:
 - **GCP_SA_KEY** - Service account JSON key file contents
 - **GCP_SA_EMAIL** - Service account email address
+- **AUTH_TOKEN** - Authorization token for API requests

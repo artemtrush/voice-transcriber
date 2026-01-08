@@ -30,6 +30,14 @@ jobs:
           timeout: 300
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           ingress_settings: ALLOW_ALL
+          env_vars: AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}
+
+      - name: Make function publicly accessible
+        run: |
+          gcloud functions add-iam-policy-binding voice-transcriber \
+            --region=europe-central2 \
+            --member=allUsers \
+            --role=roles/cloudfunctions.invoker
 
       - name: Output Function URL
         run: |
