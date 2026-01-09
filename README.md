@@ -5,7 +5,7 @@
 ### Service Account Requirements
 
 Create a service account with the following roles:
-- **Cloud Functions Developer** - Deploy and manage functions
+- **Cloud Functions Admin** - Deploy and manage functions
 - **Service Account User** - Required to deploy as service account
 - **Cloud Build Editor** - Required for building the function
 - **Artifact Registry Writer** - Push container images
