@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.3.0",
+    "@notionhq/client": "^2.2.15",
     "busboy": "^1.6.0"
   }
 }
