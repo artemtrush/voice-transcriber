@@ -19,6 +19,13 @@ functions.http('voiceTranscriber', async (req, res) => {
     console.log('Start processing file...');
     const fileBuffer = req.body;
 
+    if (!Buffer.isBuffer(fileBuffer)) {
+      console.error('Request body is not a Buffer');
+      return res.status(400).json({ error: 'Invalid file format - expected binary data' });
+    }
+
+    console.log(`File buffer size: ${fileBuffer.length} bytes`);
+
     console.log('Transcribing file...');
     const transcription = await transcribeFile(fileBuffer);
 
