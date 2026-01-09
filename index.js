@@ -1,6 +1,5 @@
 const functions = require('@google-cloud/functions-framework');
 const { checkAuthorization } = require('./src/auth');
-const { extractFileFromRequest } = require('./src/extract-file');
 const { transcribeFile } = require('./src/transcribe-file');
 const { createNote } = require('./src/create-note');
 
@@ -18,12 +17,10 @@ functions.http('voiceTranscriber', async (req, res) => {
 
   try {
     console.log('Start processing file...');
-
-    console.log('Extracting file from request...');
-    // const fileData = await extractFileFromRequest(req);
+    const fileBuffer = req.body;
 
     console.log('Transcribing file...');
-    const transcription = await transcribeFile(fileData);
+    const transcription = await transcribeFile(fileBuffer);
 
     console.log('Creating note...');
     await createNote(transcription);

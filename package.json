@@ -10,8 +10,10 @@
     "node": "20"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
     "@google-cloud/functions-framework": "^3.3.0",
     "@notionhq/client": "^2.2.15",
-    "busboy": "^1.6.0"
+    "ai": "^4.0.0",
+    "envalid": "^8.0.0"
   }
 }

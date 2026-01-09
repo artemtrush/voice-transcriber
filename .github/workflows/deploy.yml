@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -33,7 +34,11 @@ jobs:
           timeout: 300
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           ingress_settings: ALLOW_ALL
-          env_vars: AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}
+          env_vars: |
+            AUTH_TOKEN=${{ secrets.AUTH_TOKEN }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
+            NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
 
       - name: Make function publicly accessible
         run: |

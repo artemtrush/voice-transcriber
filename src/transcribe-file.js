@@ -1,8 +1,16 @@
-async function transcribeFile(fileData) {
-  console.log(`File received: ${fileData.filename}`);
-  console.log(`File size: ${fileData.size} bytes`);
+const { experimental_transcribe: transcribe } = require('ai');
+const { openai } = require('@ai-sdk/openai');
+const config = require('./config');
 
-  return 'Transcription text here';
+async function transcribeFile(fileBuffer) {
+  const transcript = await transcribe({
+    model: openai.transcription('whisper-1', {
+      apiKey: config.openai.apiKey,
+    }),
+    audio: fileBuffer,
+  });
+
+  return transcript.text;
 }
 
 module.exports = { transcribeFile };

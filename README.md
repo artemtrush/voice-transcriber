@@ -18,3 +18,6 @@ Configure these secrets in your repository:
 - **GCP_SA_KEY** - Service account JSON key file contents
 - **GCP_SA_EMAIL** - Service account email address
 - **AUTH_TOKEN** - Authorization token for API requests
+- **OPENAI_API_KEY** - OpenAI API key for Whisper transcription
+- **NOTION_TOKEN** - Notion integration token
+- **NOTION_DATABASE_ID** - Notion database ID for storing transcriptions

@@ -1,17 +1,11 @@
 const { Client } = require('@notionhq/client');
+const config = require('./config');
 
 async function createNote(transcription) {
-  const notionToken = process.env.NOTION_TOKEN;
-  const notionDatabaseId = process.env.NOTION_DATABASE_ID;
-
-  if (!notionToken || !notionDatabaseId) {
-    throw new Error('NOTION_TOKEN and NOTION_DATABASE_ID environment variables are required');
-  }
-
-  const notion = new Client({ auth: notionToken });
+  const notion = new Client({ auth: config.notion.token });
 
   await notion.pages.create({
-    parent: { database_id: notionDatabaseId },
+    parent: { database_id: config.notion.databaseId },
     properties: {
       title: {
         title: [

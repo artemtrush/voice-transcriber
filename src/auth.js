@@ -1,11 +1,8 @@
+const config = require('./config');
+
 function checkAuthorization(headers) {
   const authHeader = headers.authorization;
-  const expectedToken = process.env.AUTH_TOKEN;
-
-  if (!expectedToken) {
-    console.warn('Authorization token not found in environment variables');
-    return false;
-  }
+  const expectedToken = config.auth.token;
 
   return authHeader === expectedToken;
 }
