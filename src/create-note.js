@@ -40,8 +40,6 @@ async function createNote(transcription) {
       },
     ],
   });
-
-  console.log('Note created successfully');
 }
 
 module.exports = { createNote };

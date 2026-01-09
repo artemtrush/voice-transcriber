@@ -9,8 +9,8 @@ functions.http('voiceTranscriber', async (req, res) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  console.log('Request received', req.headers);
-  console.log('Request method', req.body);
+  console.log('Request headers', req.headers);
+  console.log('Request body', req.body.toString());
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -20,7 +20,7 @@ functions.http('voiceTranscriber', async (req, res) => {
     console.log('Start processing file...');
 
     console.log('Extracting file from request...');
-    const fileData = await extractFileFromRequest(req);
+    // const fileData = await extractFileFromRequest(req);
 
     console.log('Transcribing file...');
     const transcription = await transcribeFile(fileData);
