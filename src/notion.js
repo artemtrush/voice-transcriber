@@ -1,17 +1,17 @@
 const { Client } = require('@notionhq/client');
 const config = require('./config');
 
-async function createNote(transcription) {
-  const notion = new Client({ auth: config.notion.token });
+const notionClient = new Client({ auth: config.notion.token });
 
-  await notion.pages.create({
+async function createNote(transcription) {
+  await notionClient.pages.create({
     parent: { database_id: config.notion.databaseId },
     properties: {
       title: {
         title: [
           {
             text: {
-              content: `Voice Note - ${new Date().toISOString()}`,
+              content: `Voice Note - ${new Date().toISOString().slice(0, 16).replace('T', ' ')}`,
             },
           },
         ],

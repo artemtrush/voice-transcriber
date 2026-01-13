@@ -4,7 +4,7 @@
   "description": "Google Cloud Function for voice transcription",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "test": "dotenvx run -- node test.js"
   },
   "engines": {
     "node": "20"
@@ -14,6 +14,10 @@
     "@google-cloud/functions-framework": "^3.3.0",
     "@notionhq/client": "^2.2.15",
     "ai": "^4.0.0",
+    "dropbox": "^10.34.0",
     "envalid": "^8.0.0"
+  },
+  "devDependencies": {
+    "@dotenvx/dotenvx": "^1.0.0"
   }
 }

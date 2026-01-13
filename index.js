@@ -1,41 +1,29 @@
 const functions = require('@google-cloud/functions-framework');
-const { checkAuthorization } = require('./src/auth');
-const { transcribeFile } = require('./src/transcribe-file');
-const { createNote } = require('./src/create-note');
+const { verifyWebhookSignature } = require('./src/dropbox');
+const { processVoiceNotes } = require('./src/main');
 
 functions.http('voiceTranscriber', async (req, res) => {
-  if (!checkAuthorization(req.headers)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (req.method === 'GET' && req.query.challenge) {
+    console.log('Dropbox webhook verification received');
+    return res.status(200).send(req.query.challenge);
   }
 
-  console.log('Request headers', req.headers);
-  console.log('Request body', req.body.toString());
+  const signature = req.headers['x-dropbox-signature'];
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (!signature) {
+    console.error('Missing webhook signature header');
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  if (!verifyWebhookSignature(signature, req.rawBody)) {
+    console.error('Invalid webhook signature');
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   try {
-    console.log('Start processing file...');
-    const fileBuffer = req.body;
-
-    if (!Buffer.isBuffer(fileBuffer)) {
-      console.error('Request body is not a Buffer');
-      return res.status(400).json({ error: 'Invalid file format - expected binary data' });
-    }
-
-    console.log(`File buffer size: ${fileBuffer.length} bytes`);
-
-    console.log('Transcribing file...');
-    const transcription = await transcribeFile(fileBuffer);
-
-    console.log('Creating note...');
-    await createNote(transcription);
-
-    console.log('Successfully processed file');
-    res.status(200).json({ success: true });
+    await processVoiceNotes()
+    return res.status(200).send('OK');
   } catch (error) {
-    console.error('Error processing file:', error);
-    res.status(500).json({ error: 'Failed to process file' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 });

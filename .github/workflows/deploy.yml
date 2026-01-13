@@ -30,7 +30,7 @@ jobs:
           runtime: nodejs20
           region: europe-central2
           entry_point: voiceTranscriber
-          memory_mb: 512
+          memory_mb: 256
           timeout: 300
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           ingress_settings: ALLOW_ALL
@@ -39,6 +39,9 @@ jobs:
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}
             NOTION_DATABASE_ID=${{ secrets.NOTION_DATABASE_ID }}
+            DROPBOX_ACCESS_TOKEN=${{ secrets.DROPBOX_ACCESS_TOKEN }}
+            DROPBOX_APP_SECRET=${{ secrets.DROPBOX_APP_SECRET }}
+            DROPBOX_FOLDER_PATH=${{ secrets.DROPBOX_FOLDER_PATH }}
 
       - name: Make function publicly accessible
         run: |

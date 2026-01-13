@@ -4,7 +4,7 @@ const config = require('./config');
 
 async function transcribeFile(fileBuffer) {
   const transcript = await transcribe({
-    model: openai.transcription('whisper-1', {
+    model: openai.transcription('gpt-4o-transcribe', {
       apiKey: config.openai.apiKey,
     }),
     audio: fileBuffer,
