@@ -10,7 +10,10 @@ async function transcribeFile(fileBuffer) {
     audio: fileBuffer,
   });
 
-  return transcript.text;
+  const text = transcript.text;
+  const wordCount = text.trim().split(/\s+/).length;
+
+  return wordCount > 3 ? text : '';
 }
 
 module.exports = { transcribeFile };

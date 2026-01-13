@@ -36,7 +36,7 @@ async function processFile(file) {
     console.log('Transcribing...');
     const transcription = await transcribeFile(fileBuffer);
 
-    if (transcription.length) {
+    if (transcription) {
       console.log('Creating note...');
       await createNote(transcription);
     } else {
