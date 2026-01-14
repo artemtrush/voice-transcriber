@@ -6,8 +6,9 @@ const env = cleanEnv(process.env, {
   NOTION_TOKEN: str(),
   NOTION_DATABASE_ID: str(),
 
-  DROPBOX_ACCESS_TOKEN: str(),
+  DROPBOX_APP_KEY: str(),
   DROPBOX_APP_SECRET: str(),
+  DROPBOX_REFRESH_TOKEN: str(),
   DROPBOX_FOLDER_PATH: str(),
 });
 
@@ -20,8 +21,9 @@ const config = {
     databaseId: env.NOTION_DATABASE_ID,
   },
   dropbox: {
-    accessToken: env.DROPBOX_ACCESS_TOKEN,
+    appKey: env.DROPBOX_APP_KEY,
     appSecret: env.DROPBOX_APP_SECRET,
+    refreshToken: env.DROPBOX_REFRESH_TOKEN,
     folderPath: env.DROPBOX_FOLDER_PATH,
   },
 };

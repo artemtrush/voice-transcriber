@@ -5,7 +5,21 @@ const config = require('./config');
 const PROCESSING_SUFFIX = '.processing';
 const PROCESSED_SUFFIX = '.processed';
 
-const dropboxClient = new Dropbox({ accessToken: config.dropbox.accessToken });
+let dropboxClient;
+
+function getDropboxClient() {
+  if (dropboxClient) {
+    return dropboxClient;
+  }
+
+  dropboxClient = new Dropbox({
+    clientId: config.dropbox.appKey,
+    clientSecret: config.dropbox.appSecret,
+    refreshToken: config.dropbox.refreshToken,
+  });
+
+  return dropboxClient;
+}
 
 function isAudioFile(filename) {
   return /\.(mp3|wav|m4a|aac|ogg|flac|wma|opus|webm)$/i.test(filename);
@@ -20,19 +34,20 @@ function isProcessedFile(filename) {
 }
 
 async function listFolderChanges() {
+  const client = getDropboxClient();
   let folderPath = config.dropbox.folderPath;
 
   if (!folderPath.startsWith('/')) {
     folderPath = '/' + folderPath;
   }
 
-  const response = await dropboxClient.filesListFolder({ path: folderPath, recursive: true });
+  const response = await client.filesListFolder({ path: folderPath, recursive: true });
 
   let result = response.result;
   const allEntries = [...result.entries];
 
   while (result.has_more) {
-    const nextResponse = await dropboxClient.filesListFolderContinue({ cursor: result.cursor });
+    const nextResponse = await client.filesListFolderContinue({ cursor: result.cursor });
 
     result = nextResponse.result;
     allEntries.push(...result.entries);
@@ -65,10 +80,11 @@ async function findNewAudioFiles() {
 }
 
 async function markFileAsProcessing(filePath) {
+  const client = getDropboxClient();
   const newPath = filePath + PROCESSING_SUFFIX;
 
   try {
-    await dropboxClient.filesMoveV2({
+    await client.filesMoveV2({
       from_path: filePath,
       to_path: newPath,
       autorename: false,
@@ -82,11 +98,12 @@ async function markFileAsProcessing(filePath) {
 }
 
 async function markFileAsProcessed(filePath) {
+  const client = getDropboxClient();
   const basePath = filePath.replace(PROCESSING_SUFFIX, '');
   const newPath = basePath + PROCESSED_SUFFIX;
 
   try {
-    await dropboxClient.filesMoveV2({
+    await client.filesMoveV2({
       from_path: filePath,
       to_path: newPath,
       autorename: false,
@@ -100,10 +117,11 @@ async function markFileAsProcessed(filePath) {
 }
 
 async function revertProcessingFile(filePath) {
+  const client = getDropboxClient();
   const originalPath = filePath.replace(PROCESSING_SUFFIX, '');
 
   try {
-    await dropboxClient.filesMoveV2({
+    await client.filesMoveV2({
       from_path: filePath,
       to_path: originalPath,
       autorename: false,
@@ -117,8 +135,9 @@ async function revertProcessingFile(filePath) {
 }
 
 async function downloadFile(filePath) {
+  const client = getDropboxClient();
   try {
-    const response = await dropboxClient.filesDownload({ path: filePath });
+    const response = await client.filesDownload({ path: filePath });
 
     return response.result.fileBinary;
   } catch (error) {

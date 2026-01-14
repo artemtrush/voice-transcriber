@@ -17,10 +17,19 @@ Automatically transcribes audio files added to Dropbox using webhooks and create
    - `files.metadata.write` - Rename files
    - `files.content.read` - Download files
    - `files.content.write` - Move/rename files
-5. In **"Settings"** tab, copy **App secret**
-6. Generate and copy **Access token**
+5. In **"Settings"** tab:
+   - Copy **App key**
+   - Copy **App secret**
 
-### 2. GCP Service Account Requirements
+### 2. Get Dropbox Refresh Token
+
+Run the provided script to get a refresh token:
+
+```bash
+./bin/get-dropbox-refresh-token.sh
+```
+
+### 3. GCP Service Account Requirements
 
 Create a **Google Cloud Platform (GCP)** service account with the following roles:
 - **Cloud Functions Admin** - Deploy and manage functions
@@ -30,7 +39,7 @@ Create a **Google Cloud Platform (GCP)** service account with the following role
 - **Cloud Run Admin** - Manage Cloud Run services (2nd Gen functions)
 - **Storage Admin** - Access to Cloud Storage for function artifacts
 
-### 3. GitHub Secrets
+### 4. GitHub Secrets
 
 | Secret | Description |
 |--------|-------------|
@@ -39,11 +48,12 @@ Create a **Google Cloud Platform (GCP)** service account with the following role
 | `OPENAI_API_KEY` | OpenAI API key for transcription |
 | `NOTION_TOKEN` | Notion integration token |
 | `NOTION_DATABASE_ID` | Notion database ID for storing transcriptions |
-| `DROPBOX_ACCESS_TOKEN` | Dropbox access token from app settings |
+| `DROPBOX_APP_KEY` | Dropbox app key from app settings |
 | `DROPBOX_APP_SECRET` | Dropbox app secret from app settings |
+| `DROPBOX_REFRESH_TOKEN` | Dropbox refresh token from OAuth flow (see step 2) |
 | `DROPBOX_FOLDER_PATH` | Folder to watch (use `""` for entire Dropbox or `"/folder-name"` for specific folder) |
 
-### 4. Register Webhook
+### 5. Register Webhook
 
 After deployment:
 1. Go to your app in [Dropbox App Console](https://www.dropbox.com/developers/apps)
