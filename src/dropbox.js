@@ -1,6 +1,7 @@
 const { Dropbox } = require('dropbox');
 const crypto = require('crypto');
 const config = require('./config');
+const { CLEANUP_RETENTION_DAYS } = require('./constants');
 
 const PROCESSING_SUFFIX = '.processing';
 const PROCESSED_SUFFIX = '.processed';
@@ -22,7 +23,9 @@ function getDropboxClient() {
 }
 
 function isAudioFile(filename) {
-  return /\.(mp3|wav|m4a|aac|ogg|flac|wma|opus|webm)$/i.test(filename);
+  const supportedExtensions = ['mp3'];
+
+  return supportedExtensions.some(ext => filename.toLowerCase().endsWith(`.${ext}`));
 }
 
 function isProcessingFile(filename) {
@@ -33,7 +36,7 @@ function isProcessedFile(filename) {
   return filename.endsWith(PROCESSED_SUFFIX);
 }
 
-async function listFolderChanges() {
+async function listAllFiles() {
   const client = getDropboxClient();
   let folderPath = config.dropbox.folderPath;
 
@@ -57,7 +60,7 @@ async function listFolderChanges() {
 }
 
 async function findNewAudioFiles() {
-  const entries = await listFolderChanges();
+  const entries = await listAllFiles();
 
   const audioFiles = entries.filter(entry => {
     if (entry['.tag'] !== 'file') {
@@ -146,6 +149,44 @@ async function downloadFile(filePath) {
   }
 }
 
+async function findOldProcessedFiles() {
+  const entries = await listAllFiles();
+  const cutoffDate = new Date();
+
+  cutoffDate.setDate(cutoffDate.getDate() - CLEANUP_RETENTION_DAYS);
+
+  const oldProcessedFiles = entries.filter(entry => {
+    if (entry['.tag'] !== 'file') {
+      return false;
+    }
+
+    if (!isProcessedFile(entry.name)) {
+      return false;
+    }
+
+    const fileModifiedDate = new Date(entry.client_modified);
+
+    return fileModifiedDate < cutoffDate;
+  });
+
+  return oldProcessedFiles.map(file => ({
+    id: file.id,
+    name: file.name,
+    path: file.path_lower,
+    modifiedDate: file.client_modified,
+  }));
+}
+
+async function deleteFile(filePath) {
+  const client = getDropboxClient();
+  try {
+    await client.filesDeleteV2({ path: filePath });
+  } catch (error) {
+    console.error(`Error deleting file: ${filePath}`, error);
+    throw error;
+  }
+}
+
 function verifyWebhookSignature(signature, body) {
   const expectedSignature = crypto
     .createHmac('sha256', config.dropbox.appSecret)
@@ -164,5 +205,7 @@ module.exports = {
   markFileAsProcessed,
   revertProcessingFile,
   downloadFile,
+  findOldProcessedFiles,
+  deleteFile,
   verifyWebhookSignature,
 };
