@@ -30,7 +30,7 @@ jobs:
           runtime: nodejs20
           region: europe-central2
           entry_point: voiceTranscriber
-          memory_mb: 256
+          memory_mb: 512
           timeout: 300
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           ingress_settings: ALLOW_ALL

@@ -23,7 +23,9 @@ function getDropboxClient() {
 }
 
 function isAudioFile(filename) {
-  return /\.(mp3|wav|m4a|aac|ogg|flac|wma|opus|webm)$/i.test(filename);
+  const supportedExtensions = ['mp3'];
+
+  return supportedExtensions.some(ext => filename.toLowerCase().endsWith(`.${ext}`));
 }
 
 function isProcessingFile(filename) {
@@ -63,6 +65,10 @@ async function findNewAudioFiles() {
   const audioFiles = entries.filter(entry => {
     if (entry['.tag'] !== 'file') {
       return false;
+    }
+
+    if (entry.name === 'recording 2026-01-13 22-53.mp3.processed') {
+      return true;
     }
 
     if (isProcessingFile(entry.name) || isProcessedFile(entry.name)) {

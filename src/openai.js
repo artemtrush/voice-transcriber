@@ -1,18 +1,26 @@
 const { experimental_transcribe: transcribe, generateObject } = require('ai');
 const { openai } = require('@ai-sdk/openai');
 const config = require('./config');
-const { TRANSCRIPTION_WORDS_THRESHOLD } = require('./constants');
+const { TRANSCRIPTION_WORDS_THRESHOLD, TRANSCRIPTION_AUDIO_CHUNK_DURATION } = require('./constants');
+const { splitAudioBuffer } = require('./audio');
 const { ANALYSIS_PROMPT, ANALYSIS_SCHEMA } = require('./prompts');
 
 async function transcribeFile(fileBuffer) {
-  const transcript = await transcribe({
-    model: openai.transcription('gpt-4o-transcribe', {
-      apiKey: config.openai.apiKey,
-    }),
-    audio: fileBuffer,
-  });
+  const chunks = await splitAudioBuffer(fileBuffer, TRANSCRIPTION_AUDIO_CHUNK_DURATION);
+  const texts = [];
 
-  return transcript.text;
+  for (const chunk of chunks) {
+    const transcript = await transcribe({
+      model: openai.transcription('gpt-4o-transcribe', {
+        apiKey: config.openai.apiKey,
+      }),
+      audio: chunk,
+    });
+
+    texts.push(transcript.text);
+  }
+
+  return texts.join(' ');
 }
 
 function countWords(text) {

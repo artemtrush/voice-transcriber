@@ -36,7 +36,7 @@ async function processFile(file) {
     processingPath = await markFileAsProcessing(file.path);
 
     console.log('Downloading file...');
-    const fileBuffer = await downloadFile(processingPath);
+    const fileBuffer = await downloadFile(file.path);
 
     console.log('Transcribing...');
     const transcription = await transcribeFile(fileBuffer);
