@@ -33,7 +33,7 @@ async function analyzeTranscription(transcriptionText) {
   }
 
   const { object } = await generateObject({
-    model: openai('gpt-4.1', {
+    model: openai.chat('gpt-4.1', {
       apiKey: config.openai.apiKey,
     }),
     temperature: 0.5,

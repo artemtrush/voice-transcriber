@@ -3,9 +3,19 @@ const config = require('./config');
 
 const notionClient = new Client({ auth: config.notion.token });
 
+async function getDataSourceId() {
+  const database = await notionClient.databases.retrieve({
+    database_id: config.notion.databaseId,
+  });
+
+  return database.data_sources[0].id;
+}
+
 async function createNote({ title, text }) {
+  const dataSourceId = await getDataSourceId();
+
   await notionClient.pages.create({
-    parent: { database_id: config.notion.databaseId },
+    parent: { type: 'data_source_id', data_source_id: dataSourceId },
     properties: {
       title: {
         title: [
