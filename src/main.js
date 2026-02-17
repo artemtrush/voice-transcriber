@@ -1,4 +1,4 @@
-const { transcribeFile } = require('./transcription');
+const { transcribeFile, analyzeTranscription } = require('./openai');
 const { createNote } = require('./notion');
 const {
   findNewAudioFiles,
@@ -6,21 +6,26 @@ const {
   markFileAsProcessed,
   revertProcessingFile,
   downloadFile,
+  findOldProcessedFiles,
+  deleteFile,
 } = require('./dropbox');
 
 async function processVoiceNotes() {
+  console.log('Looking for new audio files...');
   const newFiles = await findNewAudioFiles();
 
   if (newFiles.length === 0) {
     console.log('No new audio files found');
-    return;
+  } else {
+    console.log(`Found ${newFiles.length} new audio file(s)`);
+
+    for (const file of newFiles) {
+      await processFile(file);
+    }
   }
 
-  console.log(`Found ${newFiles.length} new audio file(s)`);
-
-  for (const file of newFiles) {
-    await processFile(file);
-  }
+  console.log('Cleaning up old processed files...');
+  await cleanupOldFiles();
 }
 
 async function processFile(file) {
@@ -36,11 +41,14 @@ async function processFile(file) {
     console.log('Transcribing...');
     const transcription = await transcribeFile(fileBuffer);
 
-    if (transcription) {
+    console.log('Analyzing transcription...');
+    const analysis = await analyzeTranscription(transcription);
+
+    if (analysis) {
       console.log('Creating note...');
-      await createNote(transcription);
+      await createNote(analysis);
     } else {
-      console.log('Transcription is empty, skipping note creation');
+      console.log('Analysis does not make sense, skipping note creation');
     }
 
     console.log(`Finish processing: ${file.name}`);
@@ -51,6 +59,25 @@ async function processFile(file) {
       await revertProcessingFile(processingPath);
     }
     throw error;
+  }
+}
+
+async function cleanupOldFiles() {
+  try {
+    const oldFiles = await findOldProcessedFiles();
+
+    if (oldFiles.length === 0) {
+      console.log('No old processed files to clean up');
+      return;
+    }
+
+    for (const file of oldFiles) {
+      await deleteFile(file.path);
+    }
+
+    console.log(`Cleaned up ${oldFiles.length} old processed file(s)`);
+  } catch (error) {
+    console.error('Error during cleanup:', error);
   }
 }
 
