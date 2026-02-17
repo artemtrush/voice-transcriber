@@ -67,10 +67,6 @@ async function findNewAudioFiles() {
       return false;
     }
 
-    if (entry.name === 'recording 2026-01-13 22-53.mp3.processed') {
-      return true;
-    }
-
     if (isProcessingFile(entry.name) || isProcessedFile(entry.name)) {
       return false;
     }
